@@ -12,7 +12,8 @@ import {
 } from './game/render'
 import { TRACK, START_POSITION } from './game/track'
 import { resolveCarCollisions } from './game/collision'
-import { CHECKPOINTS, TOTAL_CHECKPOINTS } from './game/checkpoints'
+
+import { CHECKPOINTS } from './game/checkpoints'
 import {
   createLapState,
   updateLapState,

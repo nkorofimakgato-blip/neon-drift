@@ -9,7 +9,7 @@ export function drawMinimap(
   ctx: CanvasRenderingContext2D,
   car: Car,
   nextCheckpoint: number,
-  screenWidth: number,
+  _screenWidth: number,
   screenHeight: number
 ) {
   const mapX = MAP_PADDING
