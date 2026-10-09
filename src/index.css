@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@source "../src/**/*.{ts,tsx}";
+
 html,
 body,
 #root {
@@ -18,4 +20,19 @@ body,
 canvas {
   display: block;
   touch-action: none;
+}
+
+@keyframes countPulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

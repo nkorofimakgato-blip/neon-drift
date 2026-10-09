@@ -1,6 +1,7 @@
 import type { Car } from './types'
 import type { Wall } from './track'
 import type { Checkpoint } from './checkpoints'
+import type { SkidMark, Particle } from './effects'
 import { CAR_WIDTH, CAR_HEIGHT } from './constants'
 
 export function drawGrid(
@@ -38,8 +39,6 @@ export function drawCar(
   const screenX = car.pos.x - cameraX
   const screenY = car.pos.y - cameraY
 
-  // Car points RIGHT by default (canvas rotation 0 = right).
-  // Long axis is horizontal (CAR_HEIGHT), short axis is vertical (CAR_WIDTH).
   const length = CAR_HEIGHT
   const width = CAR_WIDTH
 
@@ -58,7 +57,7 @@ export function drawCar(
   ctx.fill()
   ctx.shadowBlur = 0
 
-  // Front indicator (amber triangle at RIGHT edge)
+  // Front amber triangle
   ctx.fillStyle = '#fbbf24'
   ctx.beginPath()
   ctx.moveTo(length / 2, 0)
@@ -87,7 +86,6 @@ export function drawTrack(
   cameraX: number,
   cameraY: number
 ) {
-  // Outer glow pass
   ctx.strokeStyle = 'rgba(34, 211, 238, 0.35)'
   ctx.lineWidth = 10
   ctx.lineCap = 'round'
@@ -101,7 +99,6 @@ export function drawTrack(
   }
   ctx.stroke()
 
-  // Inner crisp pass
   ctx.strokeStyle = '#a5f3fc'
   ctx.lineWidth = 3
   ctx.shadowBlur = 0
@@ -125,25 +122,65 @@ export function drawCheckpoints(
     const x = cp.pos.x - cameraX
     const y = cp.pos.y - cameraY
 
-    let color = 'rgba(148, 163, 184, 0.3)' // dim gray (already passed)
+    let color = 'rgba(148, 163, 184, 0.3)'
     if (cp.index === 0) {
-      color = 'rgba(251, 191, 36, 0.5)' // amber — finish line
+      color = 'rgba(251, 191, 36, 0.5)'
     }
     if (cp.index === nextIndex) {
-      color = 'rgba(34, 197, 94, 0.9)' // green — next target
+      color = 'rgba(34, 197, 94, 0.9)'
     }
 
-    // Filled dot
     ctx.beginPath()
     ctx.fillStyle = color
     ctx.arc(x, y, 12, 0, Math.PI * 2)
     ctx.fill()
 
-    // Outer ring
     ctx.strokeStyle = color
     ctx.lineWidth = 2
     ctx.beginPath()
     ctx.arc(x, y, 24, 0, Math.PI * 2)
     ctx.stroke()
+  }
+}
+
+export function drawSkidMarks(
+  ctx: CanvasRenderingContext2D,
+  marks: SkidMark[],
+  cameraX: number,
+  cameraY: number
+) {
+  ctx.lineCap = 'round'
+  for (const mark of marks) {
+    const alpha = 1 - mark.age / mark.lifetime
+    const x = mark.pos.x - cameraX
+    const y = mark.pos.y - cameraY
+
+    ctx.strokeStyle = `rgba(120, 240, 255, ${alpha * 0.35})`
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+
+    const dx = Math.cos(mark.angle) * 4
+    const dy = Math.sin(mark.angle) * 4
+    ctx.lineTo(x - dx, y - dy)
+    ctx.stroke()
+  }
+}
+
+export function drawParticles(
+  ctx: CanvasRenderingContext2D,
+  particles: Particle[],
+  cameraX: number,
+  cameraY: number
+) {
+  for (const p of particles) {
+    const alpha = 1 - p.age / p.lifetime
+    const x = p.pos.x - cameraX
+    const y = p.pos.y - cameraY
+
+    ctx.fillStyle = p.color.replace('ALPHA', String(alpha))
+    ctx.beginPath()
+    ctx.arc(x, y, p.size * alpha, 0, Math.PI * 2)
+    ctx.fill()
   }
 }
